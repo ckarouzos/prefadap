@@ -1,0 +1,46 @@
+# Diversity Evaluation Protocol Configuration
+#
+# This file defines the standard protocol settings for evaluating output diversity
+# across trained models. These parameters are used exclusively during diversity
+# evaluation runs and do not affect training or regular generation tasks.
+#
+# Protocol defaults (Section 5.2):
+# - N = 500 test inputs
+# - K = 16 generations per input
+# - Temperature = 1.0 (high diversity sampling)
+# - Dataset: cnndm (summarization task)
+
+generation:
+  # Datasets to evaluate for diversity (default: CNN/DailyMail summarization)
+  datasets:
+    - cnndm
+  
+  # Maximum number of test samples to evaluate (N in protocol)
+  max_samples: 500
+  
+  # Number of generations per input (K in protocol)
+  num_return_sequences: 16
+  
+  # Sampling parameters for diverse generation
+  temperature: 1.0
+  top_p: 0.95
+  do_sample: true
+  
+  # Maximum length for generated outputs (tokens)
+  max_new_tokens: 256
+
+# Diversity metrics configuration
+metrics:
+  # Metrics to compute (EAD, SBERT, NLI)
+  enabled:
+    - EAD
+    - SBERT
+    - NLI
+  
+  # SBERT semantic similarity settings
+  sbert_model: sentence-transformers/all-mpnet-base-v2
+  sbert_batch_size: 32
+  
+  # NLI logical diversity settings
+  nli_model: roberta-large-mnli
+  nli_batch_size: 8

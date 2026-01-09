@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Data, runs, and artifacts
+configs/local/
+runs/
+outputs/
+wandb/
+
+# Model checkpoints and large artifacts
+*.pt
+*.bin
+*.ckpt
+*.safetensors
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp

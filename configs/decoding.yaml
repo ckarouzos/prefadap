@@ -1,0 +1,11 @@
+# Global decoding parameters and dataset-specific generation caps
+temperature: 0.7
+top_p: 0.9
+min_new_tokens: 32
+repetition_penalty: 1.05
+seed: 0
+
+# Dataset-specific maximum token limits for generation
+datasets:
+  tldr:     {max_new_tokens: 128}   # Reddit TL;DR summaries 
+  cnndm:    {max_new_tokens: 128}   # CNN/DM news summaries 

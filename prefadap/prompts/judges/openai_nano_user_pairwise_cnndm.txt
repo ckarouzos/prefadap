@@ -1,0 +1,9 @@
+Article: """{instruction}"""
+
+Summary A: """{output_1}"""
+
+Summary B: """{output_2}"""
+
+Compare the two summaries based on faithfulness, coverage, and clarity. Determine which summary is better overall, or if they are roughly equal in quality.
+
+Respond with a JSON object containing a single "winner" field with value "A", "B", or "Tie":

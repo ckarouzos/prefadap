@@ -1,0 +1,7 @@
+# Canonical ORPO template to avoid legacy `orpo_*` field names.
+experiment_type: orpo
+description: Odds Ratio Preference Optimisation baseline with canonical hyperparameters.
+objective: orpo
+alpha_reg: 0.1
+margin: 0.1
+temperature: 1.0

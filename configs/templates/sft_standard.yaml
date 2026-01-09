@@ -1,0 +1,9 @@
+# Canonical supervised fine-tuning template used by grid generators.
+# Keeps the structure minimal so algorithm defaults can fill in training knobs.
+experiment_type: sft
+description: Baseline SFT configuration with canonical field names.
+training:
+  precision: bf16
+  gradient_checkpointing: true
+  gradient_accumulation_steps: 16
+  per_device_train_batch_size: 4

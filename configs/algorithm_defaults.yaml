@@ -1,0 +1,319 @@
+# Comprehensive Algorithm Configuration Defaults
+# This file contains configurable parameters for all algorithmic choices in training pipelines.
+# Each section includes detailed comments explaining the parameter impacts.
+
+# =============================================================================
+# PPO (Proximal Policy Optimization) Configuration
+# =============================================================================
+ppo:
+  # Number of optimization epochs per batch of data
+  # Higher values can improve learning but may cause instability
+  # Typical range: 1-4, Default: 1 for stability in RLHF scenarios
+  epochs: 1
+  
+  # Target KL divergence between old and new policies
+  # Controls how much the policy can change in one update
+  # Higher values allow more aggressive updates but risk instability
+  # Typical range: 0.01-0.1, Default: 0.01 for conservative updates
+  target_kl: 0.01
+  
+  # Coefficient for value function loss in the total loss
+  # Balances policy optimization with value function learning
+  # Higher values emphasize value function accuracy
+  # Typical range: 0.1-1.0, Default: 0.5
+  vf_coef: 0.5
+  
+  # Entropy bonus coefficient for exploration
+  # Higher values encourage more diverse policy outputs
+  # Should decrease during training for convergence
+  # Typical range: 0.0-0.1, Default: 0.01
+  entropy_coef: 0.01
+  
+  # Clipping parameter for policy updates
+  # Prevents too large policy updates that could destabilize training
+  # Typical range: 0.1-0.3, Default: 0.2
+  clip_range: 0.2
+
+# =============================================================================
+# DPO (Direct Preference Optimization) Configuration  
+# =============================================================================
+dpo:
+  # Per-device batch size for DPO training
+  # DPO typically uses smaller batch sizes for stability
+  # Default: 1 for stable preference learning
+  per_device_train_batch_size: 1
+  
+  # Temperature parameter controlling the sharpness of the preference model
+  # Higher beta makes the model more confident in preferences
+  # Lower beta allows more uncertainty in preference ranking
+  # Typical range: 0.01-1.0, Default: 0.1 for balanced preference learning
+  beta: 0.1
+  
+  # Reference model coefficient for regularization
+  # Controls how much to regularize against the reference model
+  # Higher values keep the model closer to reference behavior
+  # Typical range: 0.0-1.0, Default: 1.0 for full regularization
+  ref_coef: 1.0
+  
+  # Label smoothing factor for preference labels
+  # Reduces overconfidence by softening hard preference labels  
+  # Typical range: 0.0-0.2, Default: 0.0 for hard labels
+  label_smoothing: 0.0
+  
+  # Loss type for DPO training
+  # "sigmoid": standard DPO loss, "hinge": max-margin loss
+  # Default: "sigmoid" for standard DPO
+  loss_type: "sigmoid"
+
+# =============================================================================
+# KTO (Kahneman-Tversky Optimization) Configuration
+# =============================================================================
+kto:
+  # KTO loss coefficient balancing chosen vs rejected samples
+  # Higher lambda gives more weight to rejected samples
+  # Typical range: 1.0-3.0, Default: 1.5 for balanced learning
+  lambda: 1.5
+  
+  # Desirability threshold for KTO loss computation
+  # Controls the reference point for gains/losses in prospect theory
+  # Typical range: 0.1-1.0, Default: 0.6
+  alpha: 1.0
+  
+  # Temperature parameter for KTO loss
+  # Similar to DPO beta, controls sharpness of preferences
+  # Typical range: 0.01-1.0, Default: 0.1
+  beta: 0.1
+  
+  # Reference model coefficient
+  # Controls regularization strength against reference model
+  # Typical range: 0.0-1.0, Default: 1.0
+  ref_coef: 1.0
+
+# =============================================================================
+# ORPO (Odds Ratio Preference Optimization) Configuration
+# =============================================================================  
+orpo:
+  # Per-device batch size for ORPO training  
+  # ORPO uses slightly larger batch sizes than DPO
+  # Default: 2 for effective preference learning
+  per_device_train_batch_size: 2
+  
+  # Regularization strength for the odds ratio loss
+  # Higher values increase the preference learning signal
+  # Typical range: 0.1-1.0, Default: 0.1
+  alpha_reg: 0.1
+  
+  # Margin for preference separation
+  # Minimum desired difference between chosen and rejected probabilities
+  # Higher values enforce stronger preference distinctions
+  # Typical range: 0.1-0.5, Default: 0.1
+  margin: 0.1
+  
+  # Temperature for probability calculations
+  # Controls sharpness of the probability distribution
+  # Typical range: 0.1-2.0, Default: 1.0
+  temperature: 1.0
+
+# =============================================================================  
+# LoRA (Low-Rank Adaptation) Configuration
+# =============================================================================
+lora:
+  # Rank of the low-rank adaptation matrices
+  # Higher ranks increase model capacity but also parameters
+  # Typical range: 4-64, Default: 16 for good balance
+  # Problem statement specifies r∈{16,32}
+  r: 16
+  
+  # Scaling factor for LoRA updates  
+  # Higher alpha increases the magnitude of LoRA contributions
+  # Problem statement specifies α=16r
+  # Typical range: 8-512, Default: 256 (16*r)
+  alpha: 256
+  
+  # Dropout rate for LoRA layers
+  # Helps prevent overfitting in low-data scenarios
+  # Problem statement specifies dropout=0.05
+  # Typical range: 0.0-0.2, Default: 0.05
+  dropout: 0.05
+  
+  # Target modules for LoRA adaptation
+  # Specifies which model layers to adapt
+  # Problem statement specifies: q_proj,k_proj,v_proj,o_proj,gate,up,down
+  # Default: all attention and feed-forward projections
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+  # Policy for checkpoints that already contain LoRA adapters
+  # merge_then_new: fuse existing adapters into the base weights and apply a fresh one
+  # new_adapter: retain existing adapters and register a new adapter name
+  on_peft: merge_then_new
+
+  # Whether to freeze embedding layers during adaptation
+  # Helps preserve pre-trained representations
+  # Default: true to reduce variance across methods
+  freeze_embeddings: true
+
+# =============================================================================
+# Training Strategy Configuration
+# =============================================================================
+training_strategy:
+  # Gradient accumulation steps
+  # Problem statement specifies: eff. 128 seqs (micro 4–8 × GA to fit 24–48GB)
+  # Simulates larger batch sizes with limited memory
+  # Total effective batch = per_device_batch * accumulation_steps * num_devices
+  # Typical range: 1-32, Default: 32 for effective batch size ~128
+  gradient_accumulation_steps: 16
+  
+  # Per-device batch size
+  # Problem statement suggests micro 4-8 to fit 24-48GB
+  # Default: 4 for memory efficiency
+  per_device_batch_size: 4
+  
+  # Whether to use gradient checkpointing
+  # Trades computation for memory by recomputing activations
+  # Useful for large models with limited GPU memory
+  # Default: true to reduce memory footprint by default
+  gradient_checkpointing: true
+  
+  # Mixed precision training configuration
+  # Problem statement specifies: bfloat16
+  # bf16: recommended for modern hardware (A100, H100)
+  # fp16: for older hardware or when bf16 unavailable
+  # Default: bf16 for numerical stability
+  precision: bf16
+  
+# =============================================================================
+# Optimization Configuration
+# =============================================================================
+optimization:
+  # Learning rate for the main optimizer
+  # Problem statement specifies: 5e-6–2e-5 (cosine), warmup 2%
+  # Lower rates provide more stable but slower learning
+  # Higher rates enable faster learning but risk instability
+  # Typical range: 1e-6 to 1e-4, Default: 1e-5 for stability
+  learning_rate: 1e-5
+  
+  # Learning rate scheduler type
+  # Problem statement specifies: cosine
+  # "cosine": smooth decay, "linear": linear decay, "constant": no decay
+  # Default: "cosine" for smooth convergence
+  scheduler: cosine
+  
+  # Warmup ratio for learning rate scheduling
+  # Problem statement specifies: warmup 2%
+  # Fraction of training steps to use for learning rate warmup
+  # Helps stabilize early training dynamics
+  # Typical range: 0.01-0.1, Default: 0.02
+  warmup_ratio: 0.02
+  
+  # Number of training epochs
+  # Problem statement specifies: 1–2 (early stop on val pref-win)
+  # Default: 1 for initial experiments
+  num_train_epochs: 1
+  
+  # Optimizer configuration
+  # Problem statement specifies: AdamW β=(0.9,0.999), wd=0.05
+  optimizer:
+    # Optimizer type: AdamW recommended for transformer models
+    name: AdamW
+    # Beta parameters for Adam momentum and variance estimation
+    # beta1: momentum parameter, beta2: variance parameter  
+    # Problem statement: β=(0.9,0.999)
+    betas: [0.9, 0.999]
+    # Weight decay for L2 regularization
+    # Problem statement specifies: wd=0.05
+    # Helps prevent overfitting
+    # Typical range: 0.01-0.1, Default: 0.05
+    weight_decay: 0.05
+
+# =============================================================================
+# Data Processing Configuration  
+# =============================================================================
+data_processing:
+  # Maximum sequence length for different domains
+  # Problem statement specifies: TL;DR 1,024; CNN/DM 1,536; truncate inputs, target cap 200–300 tok
+  # Longer sequences capture more context but require more memory
+  # Adjust based on typical input lengths for your domain
+  max_seq_length:
+    TLDR: 1024    # Reddit posts as specified
+    CNNDM: 1536   # News articles as specified
+    XSum: 512     # BBC articles are medium length
+    default: 1024 # Fallback for other domains
+  
+  # Target sequence length caps for generation
+  # Problem statement specifies target cap 200-300 tokens
+  max_target_length:
+    TLDR: 200     # Shorter summaries for Reddit
+    CNNDM: 300    # Longer summaries for news articles  
+    XSum: 200     # Concise summaries for BBC
+    default: 200  # Conservative default
+  
+  # Random subset sampling ratio
+  # Fraction of dataset to use for faster experimentation
+  # Set to null/None to use full dataset
+  # Typical range: 0.1-1.0, Default: null for full data
+  random_subset: null
+  
+  # Structured subset selection
+  # Named subset of dataset to use (if available)
+  # Leave empty to use default dataset split
+  # Default: "" for default split
+  structured_subset: ""
+
+# =============================================================================
+# Logging and Monitoring Configuration
+# =============================================================================
+logging:
+  # Steps between logging training metrics
+  # More frequent logging provides better monitoring but adds overhead
+  # Typical range: 10-100, Default: 10 for detailed monitoring
+  steps: 10
+  
+  # Whether to log token counts during training
+  # Useful for understanding computational costs
+  # Default: false to reduce logging overhead
+  log_token_count: false
+  
+  # Whether to log KL divergence metrics
+  # Important for RLHF methods to monitor policy drift
+  # Default: false, enable for policy-based methods
+  log_kl: false
+  
+  # Whether to save indices of training/evaluation examples
+  # Enables reproducibility and data provenance tracking
+  # Default: false to save storage space
+  save_indices: false
+  
+  # Weights & Biases project name for experiment tracking
+  # Set to your preferred project name for organization
+  wandb_project: 
+  
+  # Whether to use Weights & Biases logging
+  # Disable for offline training or if W&B not available
+  # Default: true for experiment tracking
+  use_wandb: true
+
+# =============================================================================
+# Checkpointing Configuration
+# =============================================================================
+checkpointing:
+  # Steps between model checkpoints
+  # More frequent saves provide better recovery but use more storage
+  # Typical range: 500-5000, Default: 1000
+  save_steps: 1000
+  
+  # Maximum number of checkpoints to keep
+  # Automatic cleanup of old checkpoints to save storage
+  # Typical range: 2-10, Default: 3
+  save_total_limit: 3
+  
+  # Whether to save only the best checkpoint based on eval metric
+  # Useful when storage is limited
+  # Default: false to keep all checkpoints
+  save_only_best: false

@@ -1,0 +1,45 @@
+# Shared training defaults
+# Project and environment settings
+project: preference_adaptation
+hf_cache: ~/.cache/huggingface
+
+# Technical settings
+precision: bf16
+max_seq_length:
+  TLDR: 1024
+  CNNDM: 1536
+  XSum: 512
+
+# Batch and optimization settings
+batch:
+  micro: 4
+  gradient_accumulation: 32  # effective batch size 128
+optimizer:
+  name: AdamW
+  betas: [0.9, 0.999]
+  weight_decay: 0.05
+lr:
+  learning_rate: 1e-5
+  scheduler: cosine
+  warmup_ratio: 0.02
+
+# Training settings
+num_train_epochs: 1
+logging_steps: 10
+save_steps: 1000
+seed: 0
+
+# Model configuration
+lora:
+  r: 16
+  alpha: 256  # 16 * r
+  dropout: 0.05
+
+# Output and evaluation
+output_dir: outputs/placeholder
+run_evaluation: false
+decoding_config: configs/decoding/decoding.yaml
+
+# Default experiment settings
+seeds: [0, 1, 2]  # Common seeds for experiments
+

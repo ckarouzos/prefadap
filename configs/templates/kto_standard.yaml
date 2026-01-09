@@ -1,0 +1,8 @@
+# Canonical KTO template used for both single-domain and dual-domain runs.
+experiment_type: kto
+description: Kahneman-Tversky Optimisation baseline with canonical hyperparameters.
+objective: kto
+beta: 0.1
+kto_lambda: 1.5
+kto_alpha: 0.6
+ref_coef: 1.0

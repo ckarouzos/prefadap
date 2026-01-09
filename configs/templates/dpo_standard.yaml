@@ -1,0 +1,8 @@
+# Canonical DPO template ensuring downstream configs expose the expected keys.
+experiment_type: dpo
+description: Direct Preference Optimisation baseline with canonical hyperparameters.
+objective: dpo
+beta: 0.1
+ref_coef: 1.0
+label_smoothing: 0.0
+loss_type: sigmoid

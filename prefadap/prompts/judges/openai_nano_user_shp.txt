@@ -1,0 +1,13 @@
+Given a user prompt and two responses, your task is to determine which response is more helpful to the user.
+
+User prompt:
+{prompt}
+
+Response A:
+{response_a}
+
+Response B:
+{response_b}
+
+Which response is more helpful?
+Answer with a single letter: A or B.

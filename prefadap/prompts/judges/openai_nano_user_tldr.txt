@@ -1,0 +1,11 @@
+Post: """{instruction}"""
+Summary A:
+{
+"model": "model_1",
+"summary": """{output_1}"""
+}
+Summary B:
+{
+"model": "model_2",
+"summary": """{output_2}"""
+}

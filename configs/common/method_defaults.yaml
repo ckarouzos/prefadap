@@ -1,0 +1,11 @@
+SFT: {}
+DPO:
+  beta: 0.1
+KTO:
+  lambda: 1.5
+  alpha: 1.0
+  beta: 0.1
+ORPO:
+  alpha_reg: 0.1
+  margin: 0.1
+

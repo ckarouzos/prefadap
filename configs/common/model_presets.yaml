@@ -1,0 +1,12 @@
+Llama3-8B:
+  model_name_or_path: meta-llama/Llama-3.1-8B
+  tokenizer_name_or_path: meta-llama/Llama-3.1-8B
+  lora_target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+

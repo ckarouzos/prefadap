@@ -1,0 +1,2 @@
+You are a helpful assistant, that ranks models by the quality of their
+answers.
